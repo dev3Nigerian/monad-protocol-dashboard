@@ -1,5 +1,5 @@
 {
-    "version": 2,
+    "version": 1,
     "name": "monad-protocol-dashboard",
     "builds": [
       {
@@ -19,10 +19,5 @@
         "src": "/(.*)",
         "dest": "/index.html"
       }
-    ],
-    "functions": {
-      "app/api/*.js": {
-        "runtime": "nodejs18.x"
-      }
-    }
+    ]
   }
