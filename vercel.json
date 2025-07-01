@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "name": "monad-protocol-dashboard",
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "dist"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/testnet/(.*)",
+        "dest": "/testnet/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ],
+    "functions": {
+      "app/api/*.js": {
+        "runtime": "nodejs18.x"
+      }
+    }
+  }
