@@ -9,6 +9,25 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* Enhanced text handling */
+.break-words {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 body {

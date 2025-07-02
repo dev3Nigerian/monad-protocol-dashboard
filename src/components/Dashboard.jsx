@@ -1,159 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, ExternalLink, Twitter, Github, FileText, Globe, ChevronDown, ChevronUp, X } from 'lucide-react';
-
-// Function to load all protocols from the testnet folder
-const loadProtocolsFromFolder = async () => {
-  try {
-    // In a browser environment, we need to use fetch to load files
-    // This assumes the JSON files are accessible via HTTP
-    const protocolFiles = [
-      'NadSmith.json', 'Zona.json', 'Mach_Exchange.json', 'Cordial_Systems.json',
-      'FUKU.json', 'Hyperlane.json', 'NitroFinance.json', 'PLAY_Network.json',
-      't3rn.json', 'Monorail.json', 'Ammalgam.json', 'Lootify.json',
-      'Motatoes.json', 'QuestN.json', 'Jarvis.json', 'Mu_Digital.json',
-      'Dark_Forest_Ares.json', 'Chronicle.json', 'Open_Sea.json',
-      'Antarctic_Exchange.json', 'Curvance.json', 'Balancer.json',
-      'Mentaport.json', 'Plato.json', 'HaHa_Wallet.json', 'Solv_Protocol.json',
-      'YieldKingZ.json', 'tread.fi.json', 'StakeStone.json', 'Swing_Monad.json',
-      'Uniswap_Wallet.json', 'Madhouse.json', 'Atlantis.json', 'Taya_swap.json',
-      'MemeAIAssistant.json', 'Aarna.json', 'PumpBTC.json', 'BlastCommander.json',
-      'Defx.json', 'Hedgemony.json', 'INFINIT.json', 'Odyssey.json',
-      'Isle_Finance.json', 'GameRelay.json', 'Lombard.json', 'Uniswap.json',
-      'Fizen.io.json', 'Opinion_Labs.json', 'Timeswap.json', 'Valor_Quest.json',
-      'Standard_Protocol.json', 'zkSwap.json', 'Amertis.json', 'Mace.json',
-      'Open_Ocean.json', 'MonadTiles.json', 'Mahjong123.json', 'Anterris.json',
-      'PancakeSwap.json', 'Treasure_Dwarf_Battles.json', 'Owlto_Finance.json',
-      'Tadle.json', 'Monday_Trade.json', 'AZEx.json', 'AtDawn.json',
-      'Bubblefi.json', 'Enjoyoors.json', 'Kinza_Finance.json', 'Ambient.json',
-      'Anima.json', 'OctoSwap.json', 'Monda.json', 'LFJ.json', 'Poply.json',
-      'Purps.json', 'sidekick.json', 'Tarobase.json', 'Bean_Exchange.json',
-      'Sumer.json', 'Caddy.json', 'LEVR.bet.json', 'Cycle_Network.json',
-      'Renzo.json', 'Spine_Finance.json', 'Kizzy.json', 'KiloEx.json',
-      'Diffuse.json', 'Dirol_Protocol.json', 'LA_MOUCH.json', 'Madness.json',
-      'Hive.json', 'Intract.json', 'Pingu_Exchange.json', 'Covenant.json',
-      'Crystal.json', 'Fufuture.json', 'Rubic.json', 'Nostra.json', 'XL.json',
-      'Yap_on_Chain.json', 'ELEPHAPP.json', 'eOracle.json', 'BrahmaFi.json',
-      'Monadata_AI.json', 'Flap.json', 'Stork.json', 'Fortytwo.json',
-      'SynFutures.json', 'Lendhub.json', 'Clober.json', 'Chainlink.json'
-    ];
-
-    const protocols = [];
-    
-    for (const fileName of protocolFiles) {
-      try {
-        // In a real environment, you would fetch from the actual file path
-        const response = await fetch(`/testnet/${fileName}`);
-        if (response.ok) {
-          const protocolData = await response.json();
-          protocols.push(protocolData);
-        }
-      } catch (error) {
-        console.warn(`Failed to load ${fileName}:`, error);
-      }
-    }
-    
-    return protocols;
-  } catch (error) {
-    console.error('Error loading protocols:', error);
-    // Fallback to demo data if file loading fails
-    return getDemoProtocols();
-  }
-};
-
-// Demo data for development/testing
-const getDemoProtocols = () => [
-  {
-    "name": "NadSmith",
-    "description": "AI Agent OS on Monad | Tokenizing Agents & Automating Markets - built exclusively on Monad",
-    "live": false,
-    "categories": ["AI::Compute"],
-    "addresses": {},
-    "links": {
-      "project": "https://x.com/NadSmith_",
-      "twitter": "https://x.com/NadSmith_"
-    }
-  },
-  {
-    "name": "Zona",
-    "description": "Zona is building scalable infra for composable RWA tokens. We let users mint, speculate, and earn yield on real estate Index Tokens.",
-    "live": true,
-    "categories": ["DeFi::RWA"],
-    "addresses": {
-      "Master": "0xCF91CD9f22889F1E8631a51B6115B46B51548202",
-      "ZonaOracle": "0x0Fed9873f364bD49cB4D7039567f69C59aE6Eb2B"
-    },
-    "links": {
-      "project": "https://www.zona.finance/",
-      "twitter": "https://x.com/zona_io",
-      "github": "https://github.com/zona-hk"
-    }
-  },
-  {
-    "name": "FUKU",
-    "description": "FUKU: A DefiSaving protocol on Monad, blending savings with the excitement of betting and winning prizes without risking your deposit.",
-    "live": true,
-    "categories": ["DeFi::Other"],
-    "addresses": {
-      "PrizePoolManager": "0x2e1fd6ec0923de849D6876599f214D2366d5e401",
-      "PrizePool0": "0x0168c03df4c67e4ea8bb0bd1c5459a4b719be16a"
-    },
-    "links": {
-      "project": "https://testnet.fukunad.xyz/",
-      "twitter": "https://x.com/Fuku_nad",
-      "docs": "https://fuku-1.gitbook.io/fuku-on-monad"
-    }
-  },
-  {
-    "name": "Uniswap",
-    "description": "The largest onchain marketplace. Buy and sell crypto on Ethereum and 11+ other chains.",
-    "live": true,
-    "categories": ["DeFi::DEX"],
-    "addresses": {
-      "UniswapV2Router": "0xfB8e1C3b833f9E67a71C859a132cf783b645e436",
-      "UniswapV2Factory": "0x733e88f248b742db6c14c0b1713af5ad7fdd59d0"
-    },
-    "links": {
-      "project": "https://app.uniswap.org/",
-      "twitter": "https://x.com/Uniswap"
-    }
-  },
-  {
-    "name": "Ambient",
-    "description": "Spot AMM with combining multiple liquidity types with modular hooks, dynamic fees and MEV protection",
-    "live": true,
-    "categories": ["DeFi::DEX"],
-    "addresses": {
-      "Dex": "0x88B96aF200c8a9c35442C8AC6cd3D22695AaE4F0",
-      "Query": "0x1C74Dd2DF010657510715244DA10ba19D1F3D2B7"
-    },
-    "links": {
-      "project": "https://monad.ambient.finance",
-      "twitter": "https://x.com/ambient_finance",
-      "github": "https://github.com/CrocSwap",
-      "docs": "https://docs.ambient.finance"
-    }
-  },
-  {
-    "name": "Chainlink",
-    "description": "Chainlink is the standard for onchain finance, verifiable data, and cross-chain interoperability.",
-    "live": true,
-    "categories": ["Infra::Oracle"],
-    "addresses": {
-      "Router": "0x5f16e51e3Dcb255480F090157DD01bA962a53E54"
-    },
-    "links": {
-      "project": "https://chain.link/",
-      "twitter": "https://x.com/chainlink",
-      "github": "https://github.com/smartcontractkit/chainlink",
-      "docs": "https://docs.chain.link/"
-    }
-  }
-];
+import { ProtocolLoader, getDemoProtocols } from '../utils/protocolLoader';
 
 const ProtocolCard = ({ protocol }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  const categoryInfo = protocol.categories[0]?.split('::') || ['Unknown', ''];
+  const categoryInfo = protocol.categories?.[0]?.split('::') || ['Unknown', ''];
   const mainCategory = categoryInfo[0];
   const subCategory = categoryInfo[1];
   
@@ -165,6 +17,8 @@ const ProtocolCard = ({ protocol }) => {
       'Infra': 'bg-orange-100 text-orange-800 border-orange-200',
       'NFT': 'bg-pink-100 text-pink-800 border-pink-200',
       'Consumer': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'DePIN': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      'Payments': 'bg-emerald-100 text-emerald-800 border-emerald-200',
     };
     return colors[category] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
@@ -173,24 +27,24 @@ const ProtocolCard = ({ protocol }) => {
     <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-purple-100 hover:border-purple-300 group">
       <div className="p-6">
         <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-700 transition-colors">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
+              <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-700 transition-colors truncate">
                 {protocol.name}
               </h3>
-              <div className="flex items-center gap-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryColor(mainCategory)}`}>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryColor(mainCategory)} whitespace-nowrap`}>
                   {mainCategory}
                 </span>
                 {subCategory && (
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs whitespace-nowrap">
                     {subCategory}
                   </span>
                 )}
               </div>
             </div>
             <div className="flex items-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${protocol.live ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${protocol.live ? 'bg-green-500' : 'bg-gray-400'}`}></div>
               <span className={`text-sm font-medium ${protocol.live ? 'text-green-600' : 'text-gray-500'}`}>
                 {protocol.live ? 'Live' : 'Coming Soon'}
               </span>
@@ -198,33 +52,33 @@ const ProtocolCard = ({ protocol }) => {
           </div>
         </div>
         
-        <p className="text-gray-600 mb-4 line-clamp-2">
+        <p className="text-gray-600 mb-4 line-clamp-2 break-words">
           {protocol.description}
         </p>
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
             {protocol.links?.project && (
               <a href={protocol.links.project} target="_blank" rel="noopener noreferrer" 
-                className="text-purple-600 hover:text-purple-800 transition-colors">
+                className="text-purple-600 hover:text-purple-800 transition-colors flex-shrink-0">
                 <Globe size={18} />
               </a>
             )}
             {protocol.links?.twitter && (
               <a href={protocol.links.twitter} target="_blank" rel="noopener noreferrer"
-                className="text-purple-600 hover:text-purple-800 transition-colors">
+                className="text-purple-600 hover:text-purple-800 transition-colors flex-shrink-0">
                 <Twitter size={18} />
               </a>
             )}
             {protocol.links?.github && (
               <a href={protocol.links.github} target="_blank" rel="noopener noreferrer"
-                className="text-purple-600 hover:text-purple-800 transition-colors">
+                className="text-purple-600 hover:text-purple-800 transition-colors flex-shrink-0">
                 <Github size={18} />
               </a>
             )}
             {protocol.links?.docs && (
               <a href={protocol.links.docs} target="_blank" rel="noopener noreferrer"
-                className="text-purple-600 hover:text-purple-800 transition-colors">
+                className="text-purple-600 hover:text-purple-800 transition-colors flex-shrink-0">
                 <FileText size={18} />
               </a>
             )}
@@ -233,7 +87,7 @@ const ProtocolCard = ({ protocol }) => {
           {Object.keys(protocol.addresses || {}).length > 0 && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-1 text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors"
+              className="flex items-center gap-1 text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0"
             >
               {Object.keys(protocol.addresses).length} Contract{Object.keys(protocol.addresses).length !== 1 ? 's' : ''}
               {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -242,83 +96,19 @@ const ProtocolCard = ({ protocol }) => {
         </div>
         
         {isExpanded && Object.keys(protocol.addresses || {}).length > 0 && (
-          <div className="mt-4 pt-4 border-t border-purple-100">
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">Contract Addresses</h4>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <h4 className="text-sm font-medium text-gray-900 mb-2">Contract Addresses:</h4>
             <div className="space-y-2">
               {Object.entries(protocol.addresses).map(([name, address]) => (
-                <div key={name} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                  <span className="text-sm font-medium text-gray-700">{name}</span>
-                  <code className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-mono">
-                    {address}
-                  </code>
+                <div key={name} className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 font-medium truncate mr-2">{name}:</span>
+                  <span className="text-gray-800 font-mono break-all text-right">{address}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
-    </div>
-  );
-};
-
-const FilterDropdown = ({ label, options, selected, onChange, onClear }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white border border-purple-200 rounded-lg hover:border-purple-400 transition-colors"
-      >
-        <Filter size={16} />
-        <span className="text-sm font-medium">{label}</span>
-        {selected.length > 0 && (
-          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
-            {selected.length}
-          </span>
-        )}
-        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-      
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-purple-200 rounded-lg shadow-lg z-20 max-h-64 overflow-y-auto">
-            <div className="p-3 border-b border-purple-100">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900">{label}</span>
-                {selected.length > 0 && (
-                  <button
-                    onClick={onClear}
-                    className="text-purple-600 hover:text-purple-800 text-sm"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="p-2">
-              {options.map(option => (
-                <label key={option} className="flex items-center gap-2 p-2 hover:bg-purple-50 rounded cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(option)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        onChange([...selected, option]);
-                      } else {
-                        onChange(selected.filter(item => item !== option));
-                      }
-                    }}
-                    className="text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="text-sm text-gray-700">{option}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };
@@ -331,18 +121,32 @@ const Dashboard = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
   const [statusFilter, setStatusFilter] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Create protocol loader instance
+  const protocolLoader = useMemo(() => new ProtocolLoader(), []);
 
   // Load protocols on component mount
   useEffect(() => {
-    const initializeProtocols = async () => {
+    const loadProtocols = async () => {
       try {
         setLoading(true);
         setError(null);
-        const protocols = await loadProtocolsFromFolder();
-        setProtocolsData(protocols);
+        
+        console.log('Starting protocol loading...');
+        const protocols = await protocolLoader.loadAllProtocols();
+        
+        if (protocols && protocols.length > 0) {
+          setProtocolsData(protocols);
+          console.log(`Successfully loaded ${protocols.length} protocols`);
+        } else {
+          console.warn('No protocols loaded, falling back to demo data');
+          setProtocolsData(getDemoProtocols());
+          setError('Failed to load protocols from server, showing demo data');
+        }
       } catch (err) {
-        setError('Failed to load protocols');
-        console.error('Error initializing protocols:', err);
+        console.error('Error loading protocols:', err);
+        setError(`Failed to load protocols: ${err.message}`);
         // Fallback to demo data
         setProtocolsData(getDemoProtocols());
       } finally {
@@ -350,20 +154,48 @@ const Dashboard = () => {
       }
     };
 
-    initializeProtocols();
-  }, []);
-  
+    loadProtocols();
+  }, [protocolLoader]);
+
+  // Manual refresh function
+  const refreshProtocols = async () => {
+    protocolLoader.clearCache();
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const protocols = await protocolLoader.loadAllProtocols();
+      if (protocols && protocols.length > 0) {
+        setProtocolsData(protocols);
+        setError(null);
+      } else {
+        setProtocolsData(getDemoProtocols());
+        setError('Failed to load protocols from server, showing demo data');
+      }
+    } catch (err) {
+      console.error('Error refreshing protocols:', err);
+      setError(`Failed to refresh protocols: ${err.message}`);
+      setProtocolsData(getDemoProtocols());
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Extract unique categories and subcategories
   const allCategories = useMemo(() => {
     const categories = new Set();
     const subCategories = new Set();
     
     protocolsData.forEach(protocol => {
-      protocol.categories.forEach(category => {
-        const [main, sub] = category.split('::');
-        categories.add(main);
-        if (sub) subCategories.add(sub);
-      });
+      if (protocol.categories && Array.isArray(protocol.categories)) {
+        protocol.categories.forEach(category => {
+          if (typeof category === 'string') {
+            const [main, sub] = category.split('::');
+            if (main) categories.add(main);
+            if (sub) subCategories.add(sub);
+          }
+        });
+      }
     });
     
     return {
@@ -375,9 +207,16 @@ const Dashboard = () => {
   // Filter protocols
   const filteredProtocols = useMemo(() => {
     return protocolsData.filter(protocol => {
+      // Ensure protocol has required fields
+      if (!protocol || !protocol.name || !protocol.categories) {
+        return false;
+      }
+
       // Search filter
-      const matchesSearch = protocol.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           protocol.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = !searchTerm || 
+        protocol.name.toLowerCase().includes(searchLower) ||
+        (protocol.description && protocol.description.toLowerCase().includes(searchLower));
       
       // Category filter
       const matchesCategory = selectedCategories.length === 0 ||
@@ -401,21 +240,71 @@ const Dashboard = () => {
       return matchesSearch && matchesCategory && matchesSubCategory && matchesStatus;
     });
   }, [protocolsData, searchTerm, selectedCategories, selectedSubCategories, statusFilter]);
-  
+
+  // Calculate stats
   const stats = useMemo(() => {
     const total = protocolsData.length;
     const live = protocolsData.filter(p => p.live).length;
     const categoryCounts = {};
     
     protocolsData.forEach(protocol => {
-      protocol.categories.forEach(category => {
-        const [main] = category.split('::');
-        categoryCounts[main] = (categoryCounts[main] || 0) + 1;
-      });
+      if (protocol.categories && Array.isArray(protocol.categories)) {
+        protocol.categories.forEach(category => {
+          const [main] = category.split('::');
+          if (main) {
+            categoryCounts[main] = (categoryCounts[main] || 0) + 1;
+          }
+        });
+      }
     });
     
     return { total, live, categories: categoryCounts };
   }, [protocolsData]);
+
+  // Filter handlers
+  const handleCategoryToggle = (category) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleSubCategoryToggle = (subCategory) => {
+    setSelectedSubCategories(prev => 
+      prev.includes(subCategory) 
+        ? prev.filter(c => c !== subCategory)
+        : [...prev, subCategory]
+    );
+  };
+
+  const handleStatusToggle = (status) => {
+    setStatusFilter(prev => 
+      prev.includes(status) 
+        ? prev.filter(s => s !== status)
+        : [...prev, status]
+    );
+  };
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedCategories([]);
+    setSelectedSubCategories([]);
+    setStatusFilter([]);
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Protocols</h2>
+          <p className="text-gray-600">Fetching the latest protocol data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
@@ -423,17 +312,28 @@ const Dashboard = () => {
       <div className="bg-white border-b border-purple-100 sticky top-0 z-30 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Monad Protocol Dashboard
-              </h1>
-              <p className="text-gray-600">
-                Discover and explore protocols building on Monad testnet
-              </p>
+            <div className="flex justify-between items-start flex-wrap gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Monad Protocol Dashboard
+                </h1>
+                <p className="text-gray-600">
+                  Discover and explore protocols building on Monad testnet
+                </p>
+              </div>
+              
+              {/* Refresh button */}
+              <button
+                onClick={refreshProtocols}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium disabled:opacity-50"
+                disabled={loading}
+              >
+                {loading ? 'Loading...' : 'Refresh'}
+              </button>
             </div>
             
             {/* Stats */}
-            <div className="flex gap-6 text-sm">
+            <div className="flex gap-6 text-sm flex-wrap">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                 <span className="font-semibold">{stats.total}</span>
@@ -450,110 +350,192 @@ const Dashboard = () => {
                 <span className="text-gray-600">Coming Soon</span>
               </div>
             </div>
+
+            {/* Error display */}
+            {error && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-yellow-400 rounded-full flex-shrink-0"></div>
+                  <p className="text-yellow-800 text-sm flex-1">{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="text-yellow-600 hover:text-yellow-800 flex-shrink-0"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      
-      {/* Filters */}
+
+      {/* Search and Filters */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex flex-col lg:flex-row gap-4 mb-6">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search protocols..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            />
+        <div className="bg-white rounded-xl shadow-sm border border-purple-100 p-6 mb-8">
+          {/* Search Bar */}
+          <div className="flex gap-4 items-center mb-4 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search protocols..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Filter size={18} />
+              Filters
+              {showFilters ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+
+            {(selectedCategories.length > 0 || selectedSubCategories.length > 0 || statusFilter.length > 0) && (
+              <button
+                onClick={clearAllFilters}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+              >
+                Clear All
+              </button>
+            )}
           </div>
-          
-          {/* Filters */}
-          <div className="flex gap-3 flex-wrap">
-            <FilterDropdown
-              label="Category"
-              options={allCategories.main}
-              selected={selectedCategories}
-              onChange={setSelectedCategories}
-              onClear={() => setSelectedCategories([])}
-            />
-            <FilterDropdown
-              label="Subcategory"
-              options={allCategories.sub}
-              selected={selectedSubCategories}
-              onChange={setSelectedSubCategories}
-              onClear={() => setSelectedSubCategories([])}
-            />
-            <FilterDropdown
-              label="Status"
-              options={['Live', 'Coming Soon']}
-              selected={statusFilter}
-              onChange={setStatusFilter}
-              onClear={() => setStatusFilter([])}
-            />
-          </div>
+
+          {/* Filter Controls */}
+          {showFilters && (
+            <div className="space-y-4 pt-4 border-t border-gray-200">
+              {/* Categories */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Categories</h3>
+                <div className="flex flex-wrap gap-2">
+                  {allCategories.main.map(category => (
+                    <button
+                      key={category}
+                      onClick={() => handleCategoryToggle(category)}
+                      className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                        selectedCategories.includes(category)
+                          ? 'bg-purple-100 text-purple-800 border-purple-200'
+                          : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                      }`}
+                    >
+                      {category} ({stats.categories[category] || 0})
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Subcategories */}
+              {allCategories.sub.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">Subcategories</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {allCategories.sub.map(subCategory => (
+                      <button
+                        key={subCategory}
+                        onClick={() => handleSubCategoryToggle(subCategory)}
+                        className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                          selectedSubCategories.includes(subCategory)
+                            ? 'bg-blue-100 text-blue-800 border-blue-200'
+                            : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                        }`}
+                      >
+                        {subCategory}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Status Filter */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Status</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleStatusToggle('Live')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                      statusFilter.includes('Live')
+                        ? 'bg-green-100 text-green-800 border-green-200'
+                        : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                    }`}
+                  >
+                    Live ({stats.live})
+                  </button>
+                  <button
+                    onClick={() => handleStatusToggle('Coming Soon')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                      statusFilter.includes('Coming Soon')
+                        ? 'bg-orange-100 text-orange-800 border-orange-200'
+                        : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                    }`}
+                  >
+                    Coming Soon ({stats.total - stats.live})
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        
-        {/* Active Filters */}
+
+        {/* Active Filters Display */}
         {(selectedCategories.length > 0 || selectedSubCategories.length > 0 || statusFilter.length > 0) && (
-          <div className="flex items-center gap-2 mb-6 flex-wrap">
-            <span className="text-sm text-gray-600">Active filters:</span>
-            {selectedCategories.map(category => (
-              <span key={category} className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                {category}
-                <button onClick={() => setSelectedCategories(selectedCategories.filter(c => c !== category))}>
-                  <X size={14} />
-                </button>
-              </span>
-            ))}
-            {selectedSubCategories.map(subCategory => (
-              <span key={subCategory} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                {subCategory}
-                <button onClick={() => setSelectedSubCategories(selectedSubCategories.filter(c => c !== subCategory))}>
-                  <X size={14} />
-                </button>
-              </span>
-            ))}
-            {statusFilter.map(status => (
-              <span key={status} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                {status}
-                <button onClick={() => setStatusFilter(statusFilter.filter(s => s !== status))}>
-                  <X size={14} />
-                </button>
-              </span>
-            ))}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium text-gray-700">Active filters:</span>
+              {selectedCategories.map(category => (
+                <span key={category} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
+                  {category}
+                  <button
+                    onClick={() => handleCategoryToggle(category)}
+                    className="hover:text-purple-900"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+              {selectedSubCategories.map(subCategory => (
+                <span key={subCategory} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                  {subCategory}
+                  <button
+                    onClick={() => handleSubCategoryToggle(subCategory)}
+                    className="hover:text-blue-900"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+              {statusFilter.map(status => (
+                <span key={status} className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                  {status}
+                  <button
+                    onClick={() => handleStatusToggle(status)}
+                    className="hover:text-green-900"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+            </div>
           </div>
         )}
-        
-        {/* Results */}
-        <div className="mb-4">
+
+        {/* Results Summary */}
+        <div className="mb-6">
           <p className="text-gray-600">
             Showing {filteredProtocols.length} of {protocolsData.length} protocols
           </p>
         </div>
-        
-        {/* Protocol Grid */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading protocols...</p>
-            </div>
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <div className="text-red-400 mb-4">
-              <Search size={48} className="mx-auto" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Protocols</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <p className="text-sm text-gray-500">Showing demo data instead</p>
-          </div>
-        ) : filteredProtocols.length > 0 ? (
+
+        {/* Main content */}
+        {filteredProtocols.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProtocols.map((protocol, index) => (
-              <ProtocolCard key={index} protocol={protocol} />
+              <ProtocolCard key={protocol.name || index} protocol={protocol} />
             ))}
           </div>
         ) : (
@@ -562,7 +544,15 @@ const Dashboard = () => {
               <Search size={48} className="mx-auto" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No protocols found</h3>
-            <p className="text-gray-600">Try adjusting your search terms or filters</p>
+            <p className="text-gray-600 mb-4">Try adjusting your search terms or filters</p>
+            {(selectedCategories.length > 0 || selectedSubCategories.length > 0 || statusFilter.length > 0 || searchTerm) && (
+              <button
+                onClick={clearAllFilters}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Clear All Filters
+              </button>
+            )}
           </div>
         )}
       </div>

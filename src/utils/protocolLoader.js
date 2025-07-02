@@ -4,6 +4,68 @@ export class ProtocolLoader {
     this.baseUrl = '/testnet';
     this.cache = new Map();
     this.indexUrl = `${this.baseUrl}/index.json`;
+    this.cacheKey = 'monad_protocols_cache';
+    this.cacheExpiry = null;
+  }
+
+  // localStorage cache methods
+  getCachedData() {
+    try {
+      const cached = localStorage.getItem(this.cacheKey);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+
+        let isExpired = false;
+        // Only perform expiration check if cacheExpiry is a positive number
+        if (typeof this.cacheExpiry === 'number' && this.cacheExpiry > 0) {
+          isExpired = Date.now() - timestamp > this.cacheExpiry;
+        }
+        // If cacheExpiry is null or not a positive number, isExpired remains false.
+
+        if (!isExpired) {
+          console.log('Loading protocols from localStorage cache');
+          return data;
+        }
+        // Remove expired cache
+        localStorage.removeItem(this.cacheKey);
+      }
+    } catch (error) {
+      console.warn('Failed to load from localStorage cache:', error);
+      localStorage.removeItem(this.cacheKey);
+    }
+    return null;
+  }
+  // getCachedData() {
+  //   try {
+  //     const cached = localStorage.getItem(this.cacheKey);
+  //     if (cached) {
+  //       const { data, timestamp } = JSON.parse(cached);
+  //       const isExpired = Date.now() - timestamp > this.cacheExpiry;
+  //       if (!isExpired) {
+  //         console.log('Loading protocols from localStorage cache');
+  //         return data;
+  //       }
+  //       // Remove expired cache
+  //       localStorage.removeItem(this.cacheKey);
+  //     }
+  //   } catch (error) {
+  //     console.warn('Failed to load from localStorage cache:', error);
+  //     localStorage.removeItem(this.cacheKey);
+  //   }
+  //   return null;
+  // }
+
+  setCachedData(data) {
+    try {
+      const cacheObject = {
+        data,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(this.cacheKey, JSON.stringify(cacheObject));
+      console.log(`Cached ${data.length} protocols to localStorage`);
+    } catch (error) {
+      console.warn('Failed to save to localStorage cache:', error);
+    }
   }
 
   async loadIndex() {
@@ -22,6 +84,7 @@ export class ProtocolLoader {
   }
 
   async loadProtocol(fileName) {
+    // Check memory cache first
     if (this.cache.has(fileName)) {
       return this.cache.get(fileName);
     }
@@ -32,19 +95,30 @@ export class ProtocolLoader {
         const protocol = await response.json();
         this.cache.set(fileName, protocol);
         return protocol;
+      } else {
+        console.warn(
+          `Failed to load ${fileName}: ${response.status} ${response.statusText}`
+        );
       }
     } catch (error) {
-      console.warn(`Failed to load ${fileName}:`, error);
+      console.warn(`Error loading protocol ${fileName}:`, error);
     }
     return null;
   }
 
   async loadAllProtocols() {
+    // Check localStorage cache first
+    const cachedProtocols = this.getCachedData();
+    if (cachedProtocols && cachedProtocols.length > 0) {
+      return cachedProtocols;
+    }
+
+    console.log('Loading protocols from API...');
     const protocols = [];
     const index = await this.loadIndex();
 
+    // Complete file list from your project
     const fileList = index?.protocols?.map(p => p.fileName) || [
-      // Complete list of all protocol files from your documents
       'NadSmith.json',
       'Zona.json',
       'Mach_Exchange.json',
@@ -156,126 +230,125 @@ export class ProtocolLoader {
       'Lendhub.json',
       'Clober.json',
       'Chainlink.json',
-      'NFTs2Me.json',
-      'Blazpay.json',
-      'DRKVRS.json',
-      'Nad.fun.json',
-      'Crust_Finance.json',
-      'Nextmate.ai.json',
-      'Rug_Rumble.json',
-      'coNFT.json',
-      'aPriori.json',
-      'LayerZero.json',
-      'Prediction3.json',
-      'Unipay.json',
-      'Agora.json',
-      'own.fun.json',
-      'Montools.json',
-      'Mintpad.json',
-      'Rysk.json',
-      'Pyth_Network.json',
-      'Wenwin.json',
-      'Flipside_Crypto.json',
-      'Azaar.json',
-      'TAYA.json',
-      'Primus.json',
-      'Yamata.json',
-      'DiscoCats.json',
-      'Band_Protocol.json',
-      'Codatta.json',
-      'Multipli.fi.json',
-      'Encifher.json',
-      'Fiamma.json',
-      'Gomoku3.json',
-      'Entangle.json',
-      'Talentum.json',
-      'DAU_Cards.json',
-      'Meta_Leap.json',
-      'Proof-of-Skill.json',
-      'Dyson_Finance.json',
-      'Reservoir.json',
-      'iZUMi_Finance.json',
-      'aiCraft.fun.json',
-      'EmelVerse.json',
-      'Showdown.json',
-      'Zaros.json',
-      'Zapry.json',
-      'beatBRAWLS.json',
-      'Seed_Circle.json',
-      'Bima.json',
-      'OpenPad_AI.json',
-      'Switchboard.json',
-      'Gelato.json',
-      'HeyElsa_AI.json',
-      'RgbClash.json',
-      'Kuru.json',
-      'Chainsight.json',
-      'Demask_Financial.json',
-      'Folks_Finance.json',
-      'MonadAI.json',
-      'Magma.json',
-      'Outpost_Surge.json',
-      'Slay_The_Moloch.json',
-      'Kintsu.json',
-      'Slogain.json',
       'Rabble.json',
       'ApeBond.json',
       'Nad_Name_Service.json',
     ];
 
+    // Load protocols in parallel with error handling
     const loadPromises = fileList.map(async fileName => {
-      const protocol = await this.loadProtocol(fileName);
-      if (protocol) {
-        protocols.push(protocol);
+      try {
+        const protocol = await this.loadProtocol(fileName);
+        if (protocol) {
+          protocols.push(protocol);
+        }
+      } catch (error) {
+        console.warn(`Failed to load ${fileName}:`, error);
       }
     });
 
     await Promise.all(loadPromises);
+
+    if (protocols.length > 0) {
+      // Cache the successfully loaded protocols
+      this.setCachedData(protocols);
+      console.log(`Successfully loaded ${protocols.length} protocols`);
+    } else {
+      console.warn('No protocols were loaded successfully');
+    }
+
     return protocols;
   }
 
   clearCache() {
     this.cache.clear();
+    localStorage.removeItem(this.cacheKey);
+    console.log('Cache cleared');
   }
 }
 
-// src/utils/categoryUtils.js
-export const getCategoryColor = category => {
-  const colors = {
-    AI: 'bg-purple-100 text-purple-800 border-purple-200',
-    DeFi: 'bg-blue-100 text-blue-800 border-blue-200',
-    Gaming: 'bg-green-100 text-green-800 border-green-200',
-    Infra: 'bg-orange-100 text-orange-800 border-orange-200',
-    NFT: 'bg-pink-100 text-pink-800 border-pink-200',
-    Consumer: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    DePIN: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-    Payments: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  };
-  return colors[category] || 'bg-gray-100 text-gray-800 border-gray-200';
+// Standalone function for backward compatibility
+export const loadProtocolsFromFolder = async () => {
+  const loader = new ProtocolLoader();
+  return await loader.loadAllProtocols();
 };
 
-export const extractCategoryInfo = categories => {
-  if (!categories || categories.length === 0)
-    return { main: 'Unknown', sub: '' };
-
-  const [main, sub] = categories[0].split('::');
-  return { main: main || 'Unknown', sub: sub || '' };
-};
-
-export const getAllCategories = protocols => {
-  const mainCategories = new Set();
-  const subCategories = new Set();
-
-  protocols.forEach(protocol => {
-    protocol.categories?.forEach(category => {
-      const [main, sub] = category.split('::');
-      if (main) mainCategories.add(main);
-      if (sub) subCategories.add(sub);
-    });
-  });
-
-  return {
-    main: Array.from(mainCategories).sort(),
-    sub: Array.from(subCategories).sort(),
-  };
-};
+// Demo data function for fallback
+export const getDemoProtocols = () => [
+  {
+    name: 'NadSmith',
+    description:
+      'AI Agent OS on Monad | Tokenizing Agents & Automating Markets - built exclusively on Monad',
+    live: false,
+    categories: ['AI::Compute'],
+    addresses: {},
+    links: {
+      project: 'https://x.com/NadSmith_',
+      twitter: 'https://x.com/NadSmith_',
+    },
+  },
+  {
+    name: 'Zona',
+    description:
+      'Zona is building scalable infra for composable RWA tokens. We let users mint, speculate, and earn yield on real estate Index Tokens.',
+    live: true,
+    categories: ['DeFi::RWA'],
+    addresses: {
+      Master: '0xCF91CD9f22889F1E8631a51B6115B46B51548202',
+      ZonaOracle: '0x0Fed9873f364bD49cB4D7039567f69C59aE6Eb2B',
+    },
+    links: {
+      project: 'https://www.zona.finance/',
+      twitter: 'https://x.com/zona_io',
+      github: 'https://github.com/zona-hk',
+    },
+  },
+  {
+    name: 'FUKU',
+    description:
+      'FUKU: A DefiSaving protocol on Monad, blending savings with the excitement of betting and winning prizes without risking your deposit.',
+    live: true,
+    categories: ['DeFi::Other'],
+    addresses: {
+      PrizePoolManager: '0x2e1fd6ec0923de849D6876599f214D2366d5e401',
+      PrizePool0: '0x0168c03df4c67e4ea8bb0bd1c5459a4b719be16a',
+    },
+    links: {
+      project: 'https://testnet.fukunad.xyz/',
+      twitter: 'https://x.com/Fuku_nad',
+      docs: 'https://fuku-1.gitbook.io/fuku-on-monad',
+    },
+  },
+  {
+    name: 'Uniswap',
+    description:
+      'The largest onchain marketplace. Buy and sell crypto on Ethereum and 11+ other chains.',
+    live: true,
+    categories: ['DeFi::DEX'],
+    addresses: {
+      Router: '0x5f16e51e3Dcb255480F090157DD01bA962a53E54',
+    },
+    links: {
+      project: 'https://uniswap.org/',
+      twitter: 'https://x.com/uniswap',
+      github: 'https://github.com/Uniswap',
+      docs: 'https://docs.uniswap.org/',
+    },
+  },
+  {
+    name: 'Chainlink',
+    description:
+      'Chainlink is the industry-standard decentralized oracle network that connects smart contracts to external data sources.',
+    live: true,
+    categories: ['Infra::Oracle'],
+    addresses: {
+      Router: '0x5f16e51e3Dcb255480F090157DD01bA962a53E54',
+    },
+    links: {
+      project: 'https://chain.link/',
+      twitter: 'https://x.com/chainlink',
+      github: 'https://github.com/smartcontractkit/chainlink',
+      docs: 'https://docs.chain.link/',
+    },
+  },
+];
